@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDÜ Moleküler Patoloji - DNA/RNA Gen Arama 2026</title>
+<style>
+:root{
+  --bg:#f5f7fb; --panel:#ffffff; --ink:#172033; --muted:#60708a;
+  --blue:#1b6dd8; --blue-soft:#e7f0ff; --green:#0f8a63; --green-soft:#e4f7ef;
+  --line:#d8e0ec; --warning:#8a5a00; --shadow:0 14px 35px rgba(23,32,51,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f7fbff 0%,#eef3fb 100%);color:var(--ink)}
+header{padding:34px 22px 22px;background:linear-gradient(135deg,#112e51,#1b6dd8);color:white}
+.header-inner{max-width:1180px;margin:auto;display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0 0 8px;font-size:clamp(24px,4vw,42px);letter-spacing:-.04em;line-height:1.05}
+.subtitle{font-size:16px;opacity:.92;max-width:780px;line-height:1.45}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.badge{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 12px;font-weight:700}
+main{max-width:1180px;margin:-18px auto 44px;padding:0 18px}.toolbar{background:var(--panel);box-shadow:var(--shadow);border:1px solid var(--line);border-radius:22px;padding:18px;position:sticky;top:10px;z-index:5}.search-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input[type=search]{flex:1;min-width:240px;font-size:18px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;outline:none}input[type=search]:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft)}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;padding:11px 14px;border-radius:12px;cursor:pointer;font-weight:700;color:var(--ink)}.btn.active{background:var(--blue);border-color:var(--blue);color:#fff}.btn.secondary{background:#f8fafc}.btn:hover{transform:translateY(-1px)}.summary{margin-top:12px;color:var(--muted);font-size:14px}.summary strong{color:var(--ink)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}@media(max-width:850px){.grid{grid-template-columns:1fr}.toolbar{position:static}}.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.card-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.card h2{margin:0;font-size:21px}.count{font-weight:800;border-radius:999px;padding:7px 11px;background:var(--blue-soft);color:var(--blue)}.rna .count{background:var(--green-soft);color:var(--green)}.note{padding:12px 20px;color:var(--muted);font-size:14px;line-height:1.45;border-bottom:1px solid var(--line);background:#fbfcfe}.gene-list{padding:14px;display:flex;flex-wrap:wrap;gap:8px;min-height:180px;max-height:620px;overflow:auto}.gene{border:1px solid #cbd6e5;background:#fff;color:#172033;border-radius:999px;padding:8px 10px;font-weight:700;font-size:13px;cursor:pointer;transition:.12s}.gene:hover{border-color:var(--blue);background:var(--blue-soft)}.rna .gene:hover{border-color:var(--green);background:var(--green-soft)}mark{background:#ffe58a;border-radius:4px;padding:0 2px}.empty{color:var(--muted);padding:18px;font-style:italic}.footer-note{margin-top:18px;color:var(--muted);font-size:13px;line-height:1.45}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:#172033;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);transition:.2s;z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.common{outline:2px solid rgba(27,109,216,.25)}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>SDÜ Tıp Fakültesi Tıbbi Patoloji Laboratuvarı</h1>
+      <div class="subtitle">Kapsamlı DNA Kanser Paneli ve RNA Füzyon Paneli gen arama uygulaması. Gen adını yazdıkça listeler otomatik filtrelenir.</div>
+      <div class="badges"><span class="badge">Altium DNA: 679 gen</span><span class="badge">Altium RNA füzyon: 80 gen</span><span class="badge">Canlı filtreleme</span></div>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="toolbar">
+    <div class="search-row">
+      <input id="q" type="search" placeholder="Gen adı yazın: EGFR, KRAS, ALK, NTRK, BRCA1..." autofocus>
+      <div class="buttons">
+        <button class="btn active" data-mode="all">DNA + RNA</button>
+        <button class="btn" data-mode="dna">Sadece DNA</button>
+        <button class="btn" data-mode="rna">Sadece RNA füzyon</button>
+        <button class="btn secondary" id="clearBtn">Temizle</button>
+        <button class="btn secondary" id="copyResults">Görüneni kopyala</button>
+      </div>
+    </div>
+    <div class="summary" id="summary"></div>
+  </section>
+  <section class="grid">
+    <article class="card dna">
+      <div class="card-head"><h2>DNA Kanser Paneli</h2><span class="count" id="dnaCount"></span></div>
+      <div class="note">DNA panelinde panel kapsamındaki DNA genleri birlikte değerlendirilir. Raporlamada SNV/indel, uygun bölgelerde CNV, seçili yapısal değişiklikler, TMB, MSI ve HRD bilgileri ayrı başlıklarla verilebilir.</div>
+      <div class="gene-list" id="dnaList"></div>
+    </article>
+    <article class="card rna">
+      <div class="card-head"><h2>RNA Füzyon Paneli</h2><span class="count" id="rnaCount"></span></div>
+      <div class="note">RNA füzyon paneli DNA panelinden ayrı bir çalışmadır. Bu panelde amaç, listelenen RNA füzyon genleri üzerinden klinik anlamlı füzyon/yeniden düzenlenme varlığını araştırmaktır.</div>
+      <div class="gene-list" id="rnaList"></div>
+    </article>
+  </section>
+  <div class="footer-note">Not: Genlerin üzerine tıklayarak tek gen adını kopyalayabilirsiniz. Mavi çerçeveli genler DNA ve RNA listelerinde ortak yer alan genlerdir.</div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const dnaGenes = ["ABL1", "ABL2", "ABR", "ACVR1", "ACVR1B", "ACVR2A", "ADGRA2", "AJUBA", "AKAP9", "AKT1", "AKT2", "AKT3", "ALK", "ALOX12B", "ALOX15B", "AMER1", "ANKRD11", "ANKRD26", "APC", "APLNR", "AR", "ARAF", "ARFRP1", "ARHGAP26", "ARHGAP35", "ARID1A", "ARID1B", "ARID2", "ARID5B", "ASXL1", "ASXL2", "ATM", "ATR", "ATRX", "AURKA", "AURKB", "AURKC", "AXIN1", "AXIN2", "AXL", "B2M", "BAP1", "BARD1", "BBC3", "BCL10", "BCL2", "BCL2L1", "BCL2L11", "BCL2L2", "BCL6", "BCOR", "BCORL1", "BCR", "BIRC2", "BIRC3", "BLM", "BMPR1A", "BRAF", "BRCA1", "BRCA2", "BRD4", "BRIP1", "BTG1", "BTG2", "BTK", "C11ORF30", "CALR", "CARD11", "CASP8", "CASR", "CBFB", "CBL", "CBLB", "CCND1", "CCND2", "CCND3", "CCNE1", "CD22", "CD274", "CD276", "CD38", "CD44", "CD58", "CD70", "CD74", "CD79A", "CD79B", "CDC73", "CDH1", "CDK12", "CDK2", "CDK4", "CDK6", "CDK7", "CDK8", "CDKN1A", "CDKN1B", "CDKN1C", "CDKN2A", "CDKN2B", "CDKN2C", "CEBPA", "CENPA", "CFTR", "CHD2", "CHD4", "CHD8", "CHEK1", "CHEK2", "CIC", "CIITA", "CKS1B", "COL17A1", "CPA1", "CRBN", "CREBBP", "CRKL", "CRLF2", "CSAD", "CSF1R", "CSF3R", "CSNK1A1", "CTCF", "CTLA4", "CTNNA1", "CTNNB1", "CTRC", "CUL3", "CUL4A", "CUL4B", "CUX1", "CXCR4", "CYLD", "CYP17A1", "DAXX", "DCUN1D1", "DDR1", "DDR2", "DDX3X", "DDX41", "DDX5", "DEFB134", "DHX15", "DHX9", "DICER1", "DIS3", "DIS3L2", "DLX1", "DNAJB1", "DNMT1", "DNMT3A", "DNMT3B", "DOT1L", "DPYD", "E2F3", "EED", "EGFL7", "EGFR", "EIF1AX", "EIF4A2", "EIF4E", "ELAC2", "ELF3", "EML4", "EP300", "EPCAM", "EPHA2", "EPHA3", "EPHA5", "EPHA7", "EPHB1", "EPHB2", "EPHB4", "ERBB2", "ERBB3", "ERBB4", "ERCC1", "ERCC2", "ERCC3", "ERCC4", "ERCC5", "ERG", "ERRFI1", "ESR1", "ESR2", "ETS1", "ETV1", "ETV4", "ETV5", "ETV6", "EWSR1", "EZH2", "EZR", "FAM175A", "FAM46C", "FANCA", "FANCC", "FANCD2", "FANCE", "FANCF", "FANCG", "FANCI", "FANCL", "FANCM", "FAS", "FAT1", "FBXO11", "FBXW7", "FGF1", "FGF10", "FGF12", "FGF14", "FGF19", "FGF2", "FGF23", "FGF3", "FGF4", "FGF5", "FGF6", "FGF7", "FGF8", "FGF9", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "FH", "FLCN", "FLI1", "FLT1", "FLT3", "FLT4", "FOXA1", "FOXA2", "FOXL2", "FOXO1", "FOXP1", "FRS2", "FUBP1", "FYN", "GABRA6", "GATA1", "GATA2", "GATA3", "GATA4", "GATA6", "GEN1", "GID4", "GLI1", "GNA11", "GNA13", "GNAI2", "GNAQ", "GNAS", "GPC3", "GPS2", "GRB2", "GREM1", "GRIN2A", "GRM3", "GSK3B", "H3F3A", "H3F3B", "H3F3C", "HDAC1", "HGF", "HIF1A", "HIST1H1C", "HIST1H2BD", "HIST1H3A", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3J", "HIST2H3C", "HIST2H3D", "HIST3H3", "HLA-A", "HLA-B", "HLA-C", "HNF1A", "HNRNPK", "HOXB13", "HOXC6", "HRAS", "HSD3B1", "HSP90AA1", "ICOSLG", "ID3", "IDH1", "IDH2", "IDO1", "IDO2", "IFNGR1", "IFNGR2", "IGF1", "IGF1R", "IGF2", "IKBKE", "IKZF1", "IKZF3", "IL10", "IL6R", "IL6ST", "IL7R", "ING1", "INHA", "INHBA", "INPP4A", "INPP4B", "INSR", "IRF1", "IRF2", "IRF4", "IRS1", "IRS2", "JAK1", "JAK2", "JAK3", "JUN", "KAT6A", "KDM5A", "KDM5C", "KDM6A", "KDR", "KEAP1", "KEL", "KIAA1549", "KIF5B", "KIT", "KLF2", "KLF4", "KLHL6", "KMT2A", "KMT2B", "KMT2C", "KMT2D", "KRAS", "LAMP1", "LATS1", "LATS2", "LMO1", "LRP1B", "LTK", "LYN", "LZTR1", "MAF", "MAGEC3", "MAGI2", "MALT1", "MAML2", "MAP2K1", "MAP2K2", "MAP2K4", "MAP3K1", "MAP3K13", "MAP3K14", "MAP3K4", "MAP3K7", "MAPK1", "MAPK3", "MAX", "MC1R", "MCL1", "MDC1", "MDM2", "MDM4", "MECOM", "MED12", "MEF2B", "MEN1", "MERTK", "MET", "MGA", "MGMT", "MITF", "MKNK1", "MLH1", "MLLT3", "MPL", "MRE11A", "MSH2", "MSH3", "MSH6", "MST1", "MST1R", "MTAP", "MTOR", "MUTYH", "MYB", "MYC", "MYCL", "MYCN", "MYD88", "MYH9", "MYOD1", "NAB2", "NBN", "NCOA2", "NCOA3", "NCOR1", "NCOR2", "NEGR1", "NF1", "NF2", "NFE2L2", "NFKB2", "NFKBIA", "NKX2-1", "NKX3-1", "NLRC5", "NOTCH1", "NOTCH2", "NOTCH3", "NOTCH4", "NPM1", "NR3C1", "NRAS", "NRG1", "NSD1", "NT5C2", "NTHL1", "NTRK1", "NTRK2", "NTRK3", "NUP93", "NUTM1", "P2RY8", "PAK1", "PAK3", "PAK7", "PALB2", "PARK2", "PARP1", "PARP2", "PARP3", "PAX3", "PAX5", "PAX7", "PAX8", "PBRM1", "PCBP1", "PDCD1", "PDCD1LG2", "PDGFRA", "PDGFRB", "PDK1", "PDPK1", "PGR", "PHF6", "PHOX2B", "PIAS3", "PIAS4", "PIK3C2B", "PIK3C2G", "PIK3C3", "PIK3CA", "PIK3CB", "PIK3CD", "PIK3CG", "PIK3R1", "PIK3R2", "PIK3R3", "PIM1", "PIM2", "PIM3", "PLCG1", "PLCG2", "PLK2", "PMAIP1", "PML", "PMS1", "PMS2", "PNRC1", "POLD1", "POLE", "POLQ", "POT1", "PPARG", "PPM1D", "PPP2R1A", "PPP2R2A", "PPP4R2", "PPP6C", "PRAME", "PRC1", "PRDM1", "PREX2", "PRKAR1A", "PRKCI", "PRKDC", "PRSS1", "PRSS8", "PSIP1", "PSMA1", "PSMB5", "PSMD1", "PSMG2", "PTCH1", "PTEN", "PTK2", "PTPN11", "PTPRD", "PTPRO", "PTPRS", "PTPRT", "QKI", "QSER1", "RAB35", "RAC1", "RAD21", "RAD50", "RAD51", "RAD51B", "RAD51C", "RAD51D", "RAD52", "RAD54L", "RAF1", "RANBP2", "RARA", "RASA1", "RB1", "RBM10", "RECQL4", "REL", "REST", "RET", "RFWD2", "RFX5", "RFXAP", "RHEB", "RHOA", "RICTOR", "RIT1", "RNASEL", "RNF43", "ROS1", "RPL22", "RPL5", "RPS6KA4", "RPS6KB1", "RPS6KB2", "RPTOR", "RRM1", "RSPO2", "RUNX1", "RUNX1T1", "RXRA", "RYBP", "SDC4", "SDHA", "SDHAF2", "SDHB", "SDHC", "SDHD", "SERPINB3", "SERPINB4", "SETBP1", "SETD2", "SF3B1", "SGK1", "SH2B3", "SH2D1A", "SHQ1", "SIN3A", "SLC34A2", "SLIT2", "SLX4", "SMAD2", "SMAD3", "SMAD4", "SMARCA4", "SMARCB1", "SMARCD1", "SMARCE1", "SMC1A", "SMC3", "SMG1", "SMO", "SNCAIP", "SOCS1", "SOS1", "SOX10", "SOX17", "SOX2", "SOX9", "SPEN", "SPINK1", "SPOP", "SPTA1", "SRC", "SRSF2", "STAG1", "STAG2", "STAT1", "STAT3", "STAT4", "STAT5A", "STAT5B", "STAT6", "STK11", "STK40", "SUFU", "SUZ12", "SYK", "TAF1", "TAF3", "TAP1", "TAP2", "TAPBP", "TBL1XR1", "TBX3", "TCEB1", "TCF12", "TCF3", "TCF7L2", "TEK", "TERC", "TERT", "TET1", "TET2", "TFE3", "TFEB", "TFRC", "TGFBR1", "TGFBR2", "TIPARP", "TLR4", "TMEM127", "TMPRSS2", "TNFAIP3", "TNFRSF14", "TOP1", "TOP2A", "TP53", "TP53BP1", "TP63", "TP73", "TRAF2", "TRAF3", "TRAF7", "TSC1", "TSC2", "TSHR", "TYR", "TYRO3", "U2AF1", "UGT1A1", "UVRAG", "VEGFA", "VHL", "VTCN1", "WHSC1", "WHSC1L1", "WISP3", "WRN", "WT1", "XBP1", "XIAP", "XPO1", "XRCC2", "YAP1", "YES1", "ZBTB2", "ZBTB7A", "ZFHX3", "ZFP36L1", "ZMYM2", "ZMYM3", "ZNF217", "ZNF703", "ZNF750", "ZRSR2"];
+const rnaGenes = ["ABL1", "AKT3", "ALK", "AR", "ARHGAP26", "AXL", "BCL2", "BRAF", "BRCA1", "BRCA2", "BRD3", "BRD4", "CDK4", "CIC", "CSF1R", "EGFR", "EML4", "ERBB2", "ERG", "ESR1", "ETS1", "ETV1", "ETV4", "ETV5", "ETV6", "EWSR1", "FGFR1", "FGFR2", "FGFR3", "FGFR4", "FGR", "FLI1", "FLT1", "FLT3", "INSR", "JAK2", "KDR", "KIF5B", "KIT", "KMT2A", "MAML2", "MAST1", "MAST2", "MET", "MLLT3", "MSH2", "MSMB", "MUSK", "MYB", "MYC", "NOTCH1", "NOTCH2", "NOTCH3", "NRG1", "NTRK1", "NTRK2", "NTRK3", "NUMBL", "NUTM1", "PAX3", "PAX7", "PDGFRA", "PDGFRB", "PIK3CA", "PKN1", "PPARG", "PRKCA", "PRKCB", "RAF1", "RELA", "RET", "ROS1", "RPS6KB1", "RSPO2", "RSPO3", "TERT", "TFE3", "TFEB", "THADA", "TMPRSS2"];
+let mode = 'all';
+const q = document.getElementById('q');
+const dnaList = document.getElementById('dnaList');
+const rnaList = document.getElementById('rnaList');
+const dnaCount = document.getElementById('dnaCount');
+const rnaCount = document.getElementById('rnaCount');
+const summary = document.getElementById('summary');
+const buttons = document.querySelectorAll('[data-mode]');
+const commonSet = new Set(dnaGenes.filter(g => rnaGenes.includes(g)));
+function esc(s){return s.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function highlight(g, query){
+  if(!query) return esc(g);
+  const idx = g.toLowerCase().indexOf(query.toLowerCase());
+  if(idx < 0) return esc(g);
+  return esc(g.slice(0,idx)) + '<mark>' + esc(g.slice(idx,idx+query.length)) + '</mark>' + esc(g.slice(idx+query.length));
+}
+function renderList(target, genes, query, visible){
+  target.innerHTML = '';
+  if(!visible){ target.innerHTML = '<div class="empty">Bu panel gizlendi.</div>'; return 0; }
+  const filtered = genes.filter(g => g.toLowerCase().includes(query.toLowerCase()));
+  if(filtered.length===0){ target.innerHTML = '<div class="empty">Eşleşen gen bulunamadı.</div>'; return 0; }
+  const frag = document.createDocumentFragment();
+  filtered.forEach(g => {
+    const span = document.createElement('span');
+    span.className = 'gene' + (commonSet.has(g) ? ' common' : '');
+    span.innerHTML = highlight(g, query);
+    span.title = g + ' - kopyalamak için tıklayın';
+    span.addEventListener('click', () => copyGene(g));
+    frag.appendChild(span);
+  });
+  target.appendChild(frag);
+  return filtered.length;
+}
+function update(){
+  const query = q.value.trim();
+  const showDNA = mode==='all' || mode==='dna';
+  const showRNA = mode==='all' || mode==='rna';
+  const dc = renderList(dnaList, dnaGenes, query, showDNA);
+  const rc = renderList(rnaList, rnaGenes, query, showRNA);
+  dnaCount.textContent = showDNA ? `${dc}/${dnaGenes.length}` : `0/${dnaGenes.length}`;
+  rnaCount.textContent = showRNA ? `${rc}/${rnaGenes.length}` : `0/${rnaGenes.length}`;
+  const text = query ? `"${query}" için sonuç: DNA ${showDNA?dc:0}, RNA füzyon ${showRNA?rc:0}.` : `Toplam DNA ${dnaGenes.length} gen, RNA füzyon ${rnaGenes.length} gen. Ortak gen: ${commonSet.size}.`;
+  summary.innerHTML = '<strong>' + esc(text) + '</strong>';
+}
+function copyGene(g){
+  navigator.clipboard?.writeText(g);
+  const t = document.getElementById('toast');
+  t.textContent = g + ' kopyalandı';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1300);
+}
+buttons.forEach(b=>b.addEventListener('click',()=>{ buttons.forEach(x=>x.classList.remove('active')); b.classList.add('active'); mode=b.dataset.mode; update(); }));
+q.addEventListener('input', update);
+document.getElementById('clearBtn').addEventListener('click',()=>{q.value=''; q.focus(); update();});
+document.getElementById('copyResults').addEventListener('click',()=>{
+  const query=q.value.trim().toLowerCase();
+  const parts=[];
+  if(mode==='all'||mode==='dna') parts.push('DNA: ' + dnaGenes.filter(g=>g.toLowerCase().includes(query)).join(', '));
+  if(mode==='all'||mode==='rna') parts.push('RNA füzyon: ' + rnaGenes.filter(g=>g.toLowerCase().includes(query)).join(', '));
+  navigator.clipboard?.writeText(parts.join('\n'));
+  const t=document.getElementById('toast'); t.textContent='Görünen liste kopyalandı'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1300);
+});
+update();
+</script>
+</body>
+</html>
